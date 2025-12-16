@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>AlAjaybi eSIM Generator</title>
+  <meta name="description" content="Generate eSIM QR codes instantly. Scan to install eSIM.">
+  <!-- QRCode.js CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <style>
+    :root {
+      --card-bg: #fff;
+      --card-shadow: 0 4px 24px rgba(0,0,0,0.08);
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --border-radius: 1.2rem;
+      --font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      --text-color: #222;
+      --desc-color: #555;
+      --footer-color: #888;
+    }
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      font-family: var(--font-family);
+      background: #f3f4f6;
+      color: var(--text-color);
+      min-height: 100vh;
+    }
+    body {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    main {
+      flex: 1 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 0.5rem;
+    }
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--border-radius);
+      box-shadow: var(--card-shadow);
+      padding: 2rem 1.2rem 1.5rem 1.2rem;
+      max-width: 370px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    h1 {
+      font-size: 1.5rem;
+      margin: 0 0 0.7rem 0;
+      text-align: center;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+    .desc {
+      color: var(--desc-color);
+      font-size: 1rem;
+      margin-bottom: 1.2rem;
+      text-align: center;
+    }
+    .lpa-string {
+      word-break: break-all;
+      font-family: monospace;
+      font-size: 1.05rem;
+      background: #f1f5f9;
+      border-radius: 0.5rem;
+      padding: 0.7rem 0.8rem;
+      margin: 1.1rem 0 1.2rem 0;
+      width: 100%;
+      text-align: center;
+      min-height: 2.5em;
+      box-sizing: border-box;
+      transition: background 0.2s;
+    }
+    #qrcode {
+      margin-bottom: 1.2rem;
+      min-height: 120px;
+      min-width: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .generate-btn {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: 0.7rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+      padding: 0.9rem 2.2rem;
+      margin-bottom: 0.7rem;
+      cursor: pointer;
+      transition: background 0.18s;
+      box-shadow: 0 2px 8px rgba(37,99,235,0.07);
+      width: 100%;
+      max-width: 260px;
+      outline: none;
+      touch-action: manipulation;
+    }
+    .generate-btn:active,
+    .generate-btn:focus {
+      background: var(--primary-hover);
+    }
+    footer {
+      flex-shrink: 0;
+      text-align: center;
+      color: var(--footer-color);
+      font-size: 0.98rem;
+      padding: 1.2rem 0 0.7rem 0;
+      letter-spacing: 0.01em;
+      user-select: none;
+    }
+    @media (max-width: 480px) {
+      .card {
+        padding: 1.2rem 0.4rem 1rem 0.4rem;
+        max-width: 98vw;
+      }
+      h1 {
+        font-size: 1.15rem;
+      }
+      .desc {
+        font-size: 0.97rem;
+      }
+      .lpa-string {
+        font-size: 0.97rem;
+        padding: 0.6rem 0.4rem;
+      }
+      .generate-btn {
+        font-size: 1rem;
+        padding: 0.8rem 1.2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="card">
+      <h1>AlAjaybi eSIM Generator</h1>
+      <div class="desc">
+        Scan this QR code on your phone to install the eSIM.
+      </div>
+      <button class="generate-btn" id="generateBtn" type="button">Generate eSIM</button>
+      <div class="lpa-string" id="lpaString"></div>
+      <div id="qrcode"></div>
+    </div>
+  </main>
+  <footer>
+    Powered by AlAjaybi
+  </footer>
+  <script>
+    // Generate a random 6-character block (A-Z, 0-9)
+    function randomBlock() {
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+      let block = '';
+      for (let i = 0; i < 6; i++) {
+        block += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      return block;
+    }
+
+    // Generate the LPA string in the required format
+    function generateLPA() {
+      return `LPA:1$smdp.io$K2-${randomBlock()}-${randomBlock()}`;
+    }
+
+    // Generate and display the LPA string and QR code
+    function handleGenerate() {
+      const lpa = generateLPA();
+      const lpaDiv = document.getElementById('lpaString');
+      lpaDiv.textContent = lpa;
+
+      // Remove previous QR code if any
+      const qrDiv = document.getElementById('qrcode');
+      qrDiv.innerHTML = '';
+
+      // Generate new QR code
+      // QRCode.js expects an element and a string
+      new QRCode(qrDiv, {
+        text: lpa,
+        width: 180,
+        height: 180,
+        colorDark: "#222",
+        colorLight: "#fff",
+        correctLevel: QRCode.CorrectLevel.M
+      });
+    }
+
+    // Attach event listener to the button
+    document.getElementById('generateBtn').addEventListener('click', handleGenerate);
+
+    // Optionally, generate a code on first load
+    // handleGenerate();
+  </script>
+</body>
+</html>
